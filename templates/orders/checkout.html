@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout - Campus Mart{% endblock %}
+
+{% block content %}
+
+<div class="container my-5">
+    <h2 class="section-header">Checkout</h2>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <form method="POST" class="card">
+                {% csrf_token %}
+                
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Delivery Information</h5>
+                </div>
+                
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="delivery_name" class="form-label">Full Name *</label>
+                        <input type="text" class="form-control" id="delivery_name" name="delivery_name" required value="{{ user.get_full_name }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="delivery_phone" class="form-label">Phone Number *</label>
+                        <input type="tel" class="form-control" id="delivery_phone" name="delivery_phone" required value="{{ user.phone_number|default:'' }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="delivery_location" class="form-label">Hostel/Location *</label>
+                        <input type="text" class="form-control" id="delivery_location" name="delivery_location" placeholder="e.g., Hostel A, Room 201" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="delivery_notes" class="form-label">Additional Notes (Optional)</label>
+                        <textarea class="form-control" id="delivery_notes" name="delivery_notes" rows="3" placeholder="Any special instructions for delivery..."></textarea>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Payment Method</h5>
+                    </div>
+                    
+                    <div class="p-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="payment_method" id="cod" value="cod" checked>
+                            <label class="form-check-label" for="cod">
+                                <strong>Cash on Delivery (COD)</strong>
+                                <br>
+                                <small class="text-muted">Pay when your order arrives</small>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-4">
+                        <i class="fas fa-check-circle"></i> Place Order
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3 pb-3 border-bottom" style="max-height: 300px; overflow-y: auto;">
+                        {% for item in cart.items.all %}
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>{{ item.product.name }} x{{ item.quantity }}</span>
+                                <span>₵{{ item.get_total_price|floatformat:2 }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong>Total Amount:</strong>
+                        <strong class="text-primary" style="font-size: 1.2rem;">₵{{ cart.get_total_price|floatformat:2 }}</strong>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> You will make {{ unique_stores_count }} separate order(s) as items are from different stores.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

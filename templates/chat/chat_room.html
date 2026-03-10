@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Chat - Campus Mart{% endblock %}
+
+{% block content %}
+
+<div class="container my-5">
+    <h2 class="section-header">Chat Support</h2>
+    
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-comments"></i> 
+                        {% if chat_room.room_type == 'support' %}
+                            Support Chat
+                        {% else %}
+                            Chat with {{ chat_room.store.name }}
+                        {% endif %}
+                    </h5>
+                </div>
+                
+                <div class="card-body" style="height: 400px; overflow-y: auto; background-color: #f8f9fa;">
+                    {% for message in messages %}
+                        <div class="mb-3 {% if message.sender == request.user %}text-end{% endif %}">
+                            <div class="d-inline-block max-width-70" style="background-color: {% if message.sender == request.user %}#87CEEB{% else %}#e0e0e0{% endif %}; padding: 8px 12px; border-radius: 10px; max-width: 70%;">
+                                <p class="mb-1">{{ message.message }}</p>
+                                <small class="text-muted">{{ message.created_at|time:"H:i" }}</small>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="text-center text-muted">No messages yet. Start the conversation!</p>
+                    {% endfor %}
+                </div>
+                
+                <div class="card-footer">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="message" placeholder="Type your message..." required>
+                            <button class="btn btn-primary" type="submit">Send</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Chat Info</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Chat Type:</strong><br>
+                        {% if chat_room.room_type == 'support' %}
+                            <span class="badge bg-info">Support Chat</span>
+                        {% else %}
+                            <span class="badge bg-success">Store Chat</span>
+                            <br><small class="text-muted">{{ chat_room.store.name }}</small>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Started:</strong><br>
+                        <small class="text-muted">{{ chat_room.created_at|date:"M d, Y H:i" }}</small>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Messages:</strong><br>
+                        <small class="text-muted">{{ messages|length }} message{{ messages|length|pluralize }}</small>
+                    </div>
+                    <a href="{% url 'chat:chat_list' %}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Chat List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

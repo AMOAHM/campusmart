@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact - Campus Mart{% endblock %}
+
+{% block content %}
+
+<div class="container my-5">
+    <h2 class="section-header">Contact Us</h2>
+    
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5><i class="fas fa-envelope text-primary"></i> Email</h5>
+                        <p><a href="mailto:support@campusmart.com">support@campusmart.com</a></p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5><i class="fas fa-phone text-primary"></i> Phone</h5>
+                        <p>+233(0) 504873143</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5><i class="fas fa-map-marker-alt text-primary"></i> Address</h5>
+                        <p>University Campus<br>Student Services Building<br>Main Street</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5><i class="fas fa-clock text-primary"></i> Business Hours</h5>
+                        <p>Monday - Friday: 8 AM - 6 PM<br>Saturday: 10 AM - 4 PM<br>Sunday: Closed</p>
+                    </div>
+                    
+                    {% if user.is_authenticated and user.role == 'customer' %}
+                        <hr>
+                        <a href="{% url 'chat:create_support_chat' %}" class="btn btn-primary w-100">
+                            <i class="fas fa-comments"></i> Start Live Chat
+                        </a>
+                    {% else %}
+                        <hr>
+                        <p class="text-muted">
+                            <a href="{% url 'accounts:login_customer' %}">Login</a> to start a live chat with support.
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

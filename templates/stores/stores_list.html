@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Stores - Campus Mart{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Reduce store card sizes */
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+    
+    .card-img-top {
+        height: 140px !important;
+        object-fit: cover;
+    }
+    
+    .card-body {
+        padding: 12px !important;
+    }
+    
+    .card-title {
+        font-size: 14px !important;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+    
+    .card-text {
+        font-size: 12px !important;
+        margin-bottom: 6px;
+    }
+    
+    .btn-sm {
+        padding: 6px 12px !important;
+        font-size: 12px !important;
+    }
+    
+    .text-muted.small {
+        font-size: 11px !important;
+    }
+    
+    .fa-store.fa-5x {
+        font-size: 3rem !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container my-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="section-header">Explore Stores</h2>
+        </div>
+    </div>
+    
+    <!-- Search -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <form method="GET" class="mb-4">
+                <div class="input-group">
+                    <input type="text" name="search" class="form-control" placeholder="Search stores..." value="{{ search_query }}">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                    {% if search_query %}
+                        <a href="{% url 'stores:stores_list' %}" class="btn btn-secondary">Clear</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    {% if stores %}
+        <div class="row g-4">
+            {% for store in stores %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        {% if store.logo %}
+                            <img src="{{ store.logo.url }}" class="card-img-top" alt="{{ store.name }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="fas fa-store fa-5x text-muted"></i>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ store.name }}</h5>
+                            <p class="card-text">{{ store.description|truncatewords:20 }}</p>
+                            <p class="text-muted small">
+                                <i class="fas fa-map-marker-alt"></i> {{ store.location }}
+                            </p>
+                            <p class="text-muted small">
+                                <i class="fas fa-box"></i> {{ store.products.count }} products
+                            </p>
+                            <a href="{% url 'stores:store_detail' store.id %}" class="btn btn-primary btn-sm w-100">Visit Store</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> No stores found matching your search.
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

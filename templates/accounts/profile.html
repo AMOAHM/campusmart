@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile - Campus Mart{% endblock %}
+
+{% block content %}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-user"></i> My Profile</h4>
+                </div>
+                <div class="card-body p-5">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p><strong>Username:</strong> {{ user.username }}</p>
+                            <p><strong>Email:</strong> {{ user.email }}</p>
+                            <p><strong>Name:</strong> {{ user.get_full_name|default:"Not set" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Phone:</strong> {{ user.phone_number|default:"Not set" }}</p>
+                            <p><strong>Account Type:</strong> <span class="badge badge-cream">{{ user.get_role_display }}</span></p>
+                            <p><strong>Member Since:</strong> {{ user.date_joined|date:"M d, Y" }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if user.role == 'entrepreneur' and user.store %}
+                        <hr>
+                        <h5>Associated Store</h5>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <p><strong>Store Name:</strong> {{ user.store.name }}</p>
+                                <p><strong>Location:</strong> {{ user.store.location }}</p>
+                                <p><strong>Status:</strong> {% if user.store.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-danger">Inactive</span>{% endif %}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'accounts:profile_edit' %}" class="btn btn-primary">Edit Profile</a>
+                        <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

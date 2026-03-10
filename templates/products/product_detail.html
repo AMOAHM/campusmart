@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - Campus Mart{% endblock %}
+
+{% block content %}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'products:products_list' %}">Products</a></li>
+                    <li class="breadcrumb-item active">{{ product.name }}</li>
+                </ol>
+            </nav>
+            
+            <div class="row mb-5">
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" class="card-img" alt="{{ product.name }}">
+                        {% else %}
+                            <div class="card-img bg-light d-flex align-items-center justify-content-center" style="height: 400px;">
+                                <i class="fas fa-image fa-5x text-muted"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card p-4">
+                        <div class="mb-3">
+                            <span class="badge badge-cream">{{ product.get_product_type_display }}</span>
+                            {% if product.rating > 0 %}
+                                <span class="text-warning ms-2">
+                                    <i class="fas fa-star"></i> {{ product.rating|floatformat:1 }} ({{ product.reviews_count }} reviews)
+                                </span>
+                            {% endif %}
+                        </div>
+                        
+                        <h1 class="mb-2">{{ product.name }}</h1>
+                        
+                        <p class="store-badge mb-3">
+                            <i class="fas fa-store"></i> 
+                            <a href="{% url 'stores:store_detail' product.store.id %}">{{ product.store.name }}</a>
+                        </p>
+                        
+                        <p class="text-muted">{{ product.category.name }}</p>
+                        
+                        <hr>
+                        
+                        <h3 class="text-primary mb-3">₵{{ product.price|floatformat:2 }}</h3>
+                        
+                        {% if product.product_type == 'product' %}
+                            <p>
+                                <strong>Stock Available:</strong>
+                                {% if product.quantity > 0 %}
+                                    <span class="badge bg-success">{{ product.quantity }} units</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Out of Stock</span>
+                                {% endif %}
+                            </p>
+                        {% endif %}
+                        
+                        {% if user.is_authenticated and user.role == 'customer' %}
+                            <form method="POST" action="{% url 'orders:add_to_cart' product.id %}">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="quantity" class="form-label">Quantity</label>
+                                    <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
+                            </form>
+                        {% elif not user.is_authenticated %}
+                            <a href="{% url 'accounts:login_customer' %}" class="btn btn-primary btn-lg w-100">
+                                <i class="fas fa-sign-in-alt"></i> Login to Order
+                            </a>
+                        {% else %}
+                            <div class="alert alert-info">
+                                Only customers can purchase products.
+                            </div>
+                        {% endif %}
+                        
+                        {% if user.is_authenticated and user.role == 'entrepreneur' and user.store == product.store %}
+                            <a href="{% url 'products:edit_product' product.id %}" class="btn btn-warning w-100 mb-2">Edit Product</a>
+                            <form method="POST" action="{% url 'products:delete_product' product.id %}" class="d-inline w-100">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Are you sure?')">Delete Product</button>
+                            </form>
+                        {% endif %}
+                        
+                        <hr>
+                        
+                        <p class="text-muted small">
+                            <i class="fas fa-calendar"></i> Posted on {{ product.created_at|date:"M d, Y" }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Description -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Description</h5>
+                </div>
+                <div class="card-body">
+                    <p>{{ product.description }}</p>
+                </div>
+            </div>
+            
+            <!-- Reviews -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Customer Reviews ({{ product.product_reviews.count }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if product.product_reviews.all %}
+                        {% for review in product.product_reviews.all %}
+                            <div class="mb-3 pb-3 border-bottom">
+                                <div class="d-flex justify-content-between">
+                                    <strong>{{ review.customer.get_full_name|default:review.customer.username }}</strong>
+                                    <span class="text-warning">
+                                        {% for i in "x"|rjust:review.rating %}}<i class="fas fa-star"></i>{% endfor %}
+                                        {{ review.rating }}/5
+                                    </span>
+                                </div>
+                                {% if review.review_text %}
+                                    <p class="mt-2">{{ review.review_text }}</p>
+                                {% endif %}
+                                <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No reviews yet. Be the first to review this product!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Similar Products -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Similar Products</h5>
+                </div>
+                <div class="card-body">
+                    {% if similar_products %}
+                        {% for sim_product in similar_products %}
+                            <div class="mb-3 pb-3 border-bottom">
+                                <a href="{% url 'products:product_detail' sim_product.id %}">
+                                {% if sim_product.image %}
+                                    <img src="{{ sim_product.image.url }}" class="img-fluid rounded mb-2" alt="{{ sim_product.name }}" style="max-height: 100px; object-fit: cover;">
+                                {% else %}
+                                    <div class="bg-light d-flex align-items-center justify-content-center rounded mb-2" style="max-height: 100px;">
+                                        <i class="fas fa-image text-muted"></i>
+                                    </div>
+                                {% endif %}
+                                </a>
+                                <h6><a href="{% url 'products:product_detail' sim_product.id %}">{{ sim_product.name }}</a></h6>
+                                <p class="text-primary">₵{{ sim_product.price|floatformat:2 }}</p>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No similar products found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

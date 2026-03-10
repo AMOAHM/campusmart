@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Customer Login - Campus Mart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-card {
+        background: rgba(255, 255, 255, 0.85) !important;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(135, 206, 235, 0.3) !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .auth-card .card-header {
+        background: linear-gradient(135deg, rgba(135, 206, 235, 0.9) 0%, rgba(65, 105, 225, 0.9) 100%) !important;
+        border-bottom: 1px solid rgba(135, 206, 235, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card auth-card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-sign-in-alt"></i> Customer Login</h4>
+                </div>
+                <div class="card-body p-5">
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" autofocus required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100 mb-3">Login</button>
+                    </form>
+                    
+                    <div class="text-center mb-3">
+                        <a href="{% url 'password_reset' %}" class="text-decoration-none">
+                            <i class="fas fa-key me-1"></i> Forgot Password?
+                        </a>
+                    </div>
+                    
+                    <hr>
+                    
+                    <p class="text-center">Don't have an account? <a href="{% url 'accounts:register_customer' %}">Create one</a></p>
+                    <p class="text-center text-muted small">Are you an entrepreneur? <a href="{% url 'accounts:login_entrepreneur' %}">Login as entrepreneur</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

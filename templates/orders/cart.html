@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Cart - Campus Mart{% endblock %}
+
+{% block content %}
+
+<div class="container my-5">
+    <h2 class="section-header">Shopping Cart</h2>
+    
+    {% if cart.items.all %}
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Cart Items ({{ cart.get_total_items }})</h5>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Subtotal</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart.items.all %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'products:product_detail' item.product.id %}">{{ item.product.name }}</a>
+                                        </td>
+                                        <td>₵{{ item.product.price|floatformat:2 }}</td>
+                                        <td>{{ item.quantity }}</td>
+                                        <td><strong>₵{{ item.get_total_price|floatformat:2 }}</strong></td>
+                                        <td>
+                                            <form method="POST" action="{% url 'orders:remove_from_cart' item.id %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-danger" title="Remove">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Order Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Total Items:</span>
+                            <strong>{{ cart.get_total_items }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Total Price:</span>
+                            <strong class="text-primary" style="font-size: 1.3rem;">₵{{ cart.get_total_price|floatformat:2 }}</strong>
+                        </div>
+                        <hr>
+                        <a href="{% url 'orders:checkout' %}" class="btn btn-primary btn-lg w-100 mb-2">
+                            <i class="fas fa-credit-card"></i> Proceed to Checkout
+                        </a>
+                        <a href="{% url 'products:products_list' %}" class="btn btn-secondary w-100">
+                            Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            Your cart is empty. <a href="{% url 'products:products_list' %}">Continue shopping</a>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

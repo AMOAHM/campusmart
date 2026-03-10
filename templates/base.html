@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}KTU CampusMart - Student Marketplace{% endblock %}</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --accent-color: #f093fb;
+            --dark-bg: #0f172a;
+            --light-bg: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --sidebar-width: 320px;
+        }
+
+        * {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--light-bg) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(240, 147, 251, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Sidebar Overlay */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -100vw;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, var(--dark-bg) 0%, var(--light-bg) 100%);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+            transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 1000;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        /* Sidebar Header */
+        .sidebar-header {
+            padding: 30px 25px 20px;
+            border-bottom: 1px solid var(--glass-border);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-logo i {
+            font-size: 2rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .sidebar-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        /* Sidebar Search */
+        .sidebar-search {
+            padding: 25px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .sidebar-search .search-input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-search .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-search .search-btn {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .sidebar-search .search-btn:hover {
+            color: var(--primary-color);
+        }
+
+        /* Sidebar Navigation */
+        .sidebar-nav {
+            padding: 25px 0;
+        }
+
+        .sidebar-nav-item {
+            margin: 0 15px;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-nav-item:hover {
+            background: var(--glass-bg);
+            transform: translateX(5px);
+        }
+
+        .sidebar-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .sidebar-nav-link:hover {
+            color: var(--primary-color);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .sidebar-nav-link i {
+            width: 20px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .sidebar-nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        /* Sidebar User Section */
+        .sidebar-user {
+            padding: 25px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: var(--glass-bg);
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .sidebar-auth-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .sidebar-auth-btn.secondary {
+            background: var(--glass-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+        }
+
+        .sidebar-auth-btn.secondary:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        /* Header/Navbar */
+        .navbar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.4rem;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 50%, var(--accent-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: brightness(1); }
+            to { filter: brightness(1.2); }
+        }
+
+        .navbar-brand i {
+            font-size: 1.5rem;
+            -webkit-text-fill-color: var(--primary-color);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Hamburger Menu */
+        .hamburger-menu {
+            width: 30px;
+            height: 24px;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .hamburger-line {
+            width: 100%;
+            height: 3px;
+            background: var(--text-primary);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+
+        /* Messages */
+        .alert {
+            border: none;
+            border-radius: 10px;
+            border-left: 4px solid;
+            animation: slideIn 0.3s ease;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .alert.auto-dismiss {
+            animation: fadeOut 0.5s ease-out 2.5s forwards;
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .alert-info {
+            background-color: rgba(135, 206, 235, 0.1);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .alert-success {
+            background-color: rgba(46, 204, 113, 0.1);
+            border-color: #2ecc71;
+            color: #27ae60;
+        }
+
+        .alert-danger {
+            background-color: rgba(231, 76, 60, 0.1);
+            border-color: #e74c3c;
+            color: #c0392b;
+        }
+
+        .alert-warning {
+            background-color: rgba(241, 196, 15, 0.1);
+            border-color: #f1c40f;
+            color: #d68910;
+        }
+
+        /* Form enhancements */
+        input[type="text"], input[type="password"], input[type="email"], input[type="number"], textarea, select, .form-control {
+            background: var(--glass-bg) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--glass-border) !important;
+            border-radius: 8px !important;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus, input[type="number"]:focus, textarea:focus, select:focus, .form-control:focus {
+            background: rgba(255, 255, 255, 0.1) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        button, .btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        button:hover, .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border-color: var(--primary-color);
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            padding: 60px 0 20px;
+            margin-top: 80px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        footer h5 {
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            color: white;
+        }
+
+        footer p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+
+        footer a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        footer a:hover {
+            color: var(--primary-color);
+            transform: translateX(4px);
+        }
+
+        footer ul li {
+            margin-bottom: 8px;
+        }
+
+        .footer-divider {
+            border-color: rgba(255, 255, 255, 0.1);
+            margin: 40px 0 30px;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(135, 206, 235, 0.2);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-4px);
+        }
+
+        /* Scroll to top button */
+        .scroll-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: none;
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .scroll-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .scroll-to-top.show {
+            display: flex;
+        }
+
+        /* Collapsible Sidebar Sections */
+        .sidebar-section {
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .sidebar-section:last-child {
+            border-bottom: none;
+        }
+
+        .sidebar-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            user-select: none;
+        }
+
+        .sidebar-section-header:hover {
+            background: var(--glass-bg);
+        }
+
+        .sidebar-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-section-toggle {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+            color: var(--text-secondary);
+        }
+
+        .sidebar-section-toggle.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .sidebar-section-content {
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+            max-height: 500px;
+        }
+
+        .sidebar-section-content.collapsed {
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        /* Search section specific */
+        .sidebar-search-section .sidebar-section-content {
+            padding: 0 25px 25px;
+        }
+
+        .sidebar-search-section .sidebar-section-content.collapsed {
+            padding: 0;
+        }
+
+        /* Navigation section specific */
+        .sidebar-nav-section .sidebar-section-content {
+            padding: 0;
+        }
+
+        /* User section specific */
+        .sidebar-user-section .sidebar-section-content {
+            padding: 0 25px 25px;
+        }
+
+        .sidebar-user-section .sidebar-section-content.collapsed {
+            padding: 0;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-logo">
+                <i class="fas fa-shopping-bag"></i>
+                <span>KTU CampusMart</span>
+            </a>
+            <button class="sidebar-close" id="sidebarClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Search Section -->
+        <div class="sidebar-section sidebar-search-section">
+            <div class="sidebar-section-header" data-section="search">
+                <span class="sidebar-section-title">Search</span>
+                <div class="sidebar-section-toggle">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            <div class="sidebar-section-content">
+                <div class="sidebar-search">
+                    <form method="get" action="{% url 'search' %}">
+                        <input type="text" name="q" class="search-input" placeholder="Search products, stores..." id="sidebarSearchInput">
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Section -->
+        <div class="sidebar-section sidebar-nav-section">
+            <div class="sidebar-section-header" data-section="navigation">
+                <span class="sidebar-section-title">Navigation</span>
+                <div class="sidebar-section-toggle">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            <div class="sidebar-section-content">
+                <nav class="sidebar-nav">
+                    <div class="sidebar-nav-item">
+                        <a href="/" class="sidebar-nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                            <i class="fas fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </div>
+
+                    <div class="sidebar-nav-item">
+                        <a href="{% url 'products:products_list' %}" class="sidebar-nav-link">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>Browse Products</span>
+                        </a>
+                    </div>
+
+                    <div class="sidebar-nav-item">
+                        <a href="{% url 'stores:stores_list' %}" class="sidebar-nav-link">
+                            <i class="fas fa-store"></i>
+                            <span>Stores</span>
+                        </a>
+                    </div>
+
+                    <div class="sidebar-nav-item">
+                        <a href="{% url 'about' %}" class="sidebar-nav-link">
+                            <i class="fas fa-info-circle"></i>
+                            <span>About</span>
+                        </a>
+                    </div>
+
+                    <div class="sidebar-nav-item">
+                        <a href="{% url 'contact' %}" class="sidebar-nav-link">
+                            <i class="fas fa-envelope"></i>
+                            <span>Contact</span>
+                        </a>
+                    </div>
+
+                    {% if user.is_authenticated and user.role == 'customer' %}
+                    <div class="sidebar-nav-item">
+                        <a href="{% url 'orders:cart_view' %}" class="sidebar-nav-link">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Cart</span>
+                            {% if cart_items %}
+                                <span class="badge ms-auto">{{ cart_items|length }}</span>
+                            {% endif %}
+                        </a>
+                    </div>
+
+                    <div class="sidebar-nav-item">
+                        <a href="{% url 'chat:chat_list' %}" class="sidebar-nav-link">
+                            <i class="fas fa-comments"></i>
+                            <span>Messages</span>
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    {% if user.is_authenticated and user.role == 'entrepreneur' %}
+                    <div class="sidebar-nav-item">
+                        <a href="{% url 'stores:entrepreneur_dashboard' %}" class="sidebar-nav-link">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    {% if user.is_authenticated and user.role == 'admin' %}
+                    <div class="sidebar-nav-item">
+                        <a href="/admin/" class="sidebar-nav-link">
+                            <i class="fas fa-cog"></i>
+                            <span>Admin</span>
+                        </a>
+                    </div>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
+
+        <!-- User Section -->
+        <div class="sidebar-section sidebar-user-section">
+            <div class="sidebar-section-header" data-section="user">
+                <span class="sidebar-section-title">Account</span>
+                <div class="sidebar-section-toggle">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            <div class="sidebar-section-content">
+                <div class="sidebar-user">
+                    {% if user.is_authenticated %}
+                        <div class="user-profile">
+                            <div class="user-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="user-info">
+                                <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
+                                <div class="user-role">{{ user.role|title }}</div>
+                            </div>
+                        </div>
+
+                        <a href="{% url 'accounts:profile' %}" class="sidebar-auth-btn secondary">
+                            <i class="fas fa-user-edit me-2"></i>My Profile
+                        </a>
+
+                        <a href="{% url 'accounts:logout' %}" class="sidebar-auth-btn secondary">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a>
+                    {% else %}
+                        <a href="{% url 'accounts:login_customer' %}" class="sidebar-auth-btn">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </a>
+
+                        <a href="{% url 'accounts:register_customer' %}" class="sidebar-auth-btn secondary">
+                            <i class="fas fa-user-plus me-2"></i>Sign Up
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid px-3 px-md-5">
+            <button class="hamburger-menu" id="hamburgerMenu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-shopping-bag"></i>
+                <span>KTU CampusMart</span>
+            </a>
+
+            <div class="d-flex align-items-center gap-3">
+                {% if user.is_authenticated and user.role == 'customer' %}
+                <a href="{% url 'orders:cart_view' %}" class="position-relative">
+                    <i class="fas fa-shopping-cart text-white" style="font-size: 1.2rem;"></i>
+                    {% if cart_items %}
+                        <span class="badge bg-danger position-absolute" style="top: -8px; right: -8px; font-size: 0.7em;">{{ cart_items|length }}</span>
+                    {% endif %}
+                </a>
+                {% endif %}
+
+                <div class="dropdown">
+                    <button class="btn btn-link text-white p-0" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user" style="font-size: 1.2rem;"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        {% if user.is_authenticated %}
+                            <li><h6 class="dropdown-header">{{ user.get_full_name|default:user.username }}</h6></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'orders:order_history' %}"><i class="fas fa-box me-2"></i>Orders</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        {% else %}
+                            <li><a class="dropdown-item" href="{% url 'accounts:login_customer' %}"><i class="fas fa-sign-in-alt me-2"></i>Login</a></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:register_customer' %}"><i class="fas fa-user-plus me-2"></i>Sign Up</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Alert Messages -->
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'danger' %}exclamation-circle{% elif message.tags == 'info' %}info-circle{% else %}exclamation-triangle{% endif %} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    {% block content %}{% endblock %}
+
+    <!-- Footer -->
+    <footer>
+        <div class="container-fluid px-3 px-md-5">
+            <div class="row">
+                <div class="col-md-3 mb-4">
+                    <h5><i class="fas fa-shopping-bag me-2"></i>KTU CampusMart</h5>
+                    <p>Your trusted student marketplace connecting campus entrepreneurs with customers. Shop smart, support local.</p>
+                    <div class="social-links">
+                        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5><i class="fas fa-link me-2"></i> Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/"><i class="fas fa-chevron-right me-2"></i>Home</a></li>
+                        <li><a href="{% url 'products:products_list' %}"><i class="fas fa-chevron-right me-2"></i>Browse Products</a></li>
+                        <li><a href="{% url 'stores:stores_list' %}"><i class="fas fa-chevron-right me-2"></i>Explore Stores</a></li>
+                        <li><a href="{% url 'about' %}"><i class="fas fa-chevron-right me-2"></i>About Us</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5><i class="fas fa-headset me-2"></i> Support</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#"><i class="fas fa-chevron-right me-2"></i>Contact Us</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right me-2"></i>FAQ</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right me-2"></i>Shipping Info</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right me-2"></i>Returns</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5><i class="fas fa-envelope me-2"></i> Contact</h5>
+                    <p><i class="fas fa-envelope me-2 text-primary"></i> support@campusmart.com</p>
+                    <p><i class="fas fa-phone me-2 text-primary"></i> +233 552123657</p>
+                    <p><i class="fas fa-map-marker-alt me-2 text-primary"></i> University Campus</p>
+                </div>
+            </div>
+
+            <div class="footer-divider"></div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 KTU CampusMart. All rights reserved. | Privacy Policy | Terms of Service</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" id="scrollToTop" title="Back to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Sidebar JavaScript -->
+    <script>
+        // Sidebar functionality
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const hamburgerMenu = document.getElementById('hamburgerMenu');
+        const sidebarClose = document.getElementById('sidebarClose');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+            hamburgerMenu.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+            hamburgerMenu.classList.remove('active');
+        }
+
+        // Event listeners
+        hamburgerMenu.addEventListener('click', toggleSidebar);
+        sidebarClose.addEventListener('click', closeSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // Close sidebar on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && sidebar.classList.contains('active')) {
+                closeSidebar();
+            }
+        });
+
+        // Track user activity (keep for any future features)
+        ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(event => {
+            document.addEventListener(event, () => {}, true);
+        });
+
+        // Initialize collapsible sections
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load section collapse states
+            loadSectionStates();
+
+            // Auto-dismiss alerts
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach((alert, index) => {
+                setTimeout(() => {
+                    alert.classList.add('auto-dismiss');
+                    setTimeout(() => {
+                        if (alert.parentNode) {
+                            alert.remove();
+                        }
+                    }, 500);
+                }, 3000 + (index * 1000));
+            });
+        });
+
+        // Collapsible sections functionality
+        function initializeCollapsibleSections() {
+            const sectionHeaders = document.querySelectorAll('.sidebar-section-header');
+
+            sectionHeaders.forEach(header => {
+                header.addEventListener('click', function() {
+                    const section = this.parentElement;
+                    const content = section.querySelector('.sidebar-section-content');
+                    const toggle = this.querySelector('.sidebar-section-toggle');
+                    const sectionName = this.dataset.section;
+
+                    const isCollapsed = content.classList.contains('collapsed');
+
+                    if (isCollapsed) {
+                        content.classList.remove('collapsed');
+                        toggle.classList.remove('collapsed');
+                    } else {
+                        content.classList.add('collapsed');
+                        toggle.classList.add('collapsed');
+                    }
+
+                    // Save state to localStorage
+                    saveSectionState(sectionName, !isCollapsed);
+                });
+            });
+        }
+
+        function saveSectionState(sectionName, isExpanded) {
+            const states = JSON.parse(localStorage.getItem('sidebarSections') || '{}');
+            states[sectionName] = isExpanded;
+            localStorage.setItem('sidebarSections', JSON.stringify(states));
+        }
+
+        function loadSectionStates() {
+            const states = JSON.parse(localStorage.getItem('sidebarSections') || '{}');
+
+            // Set default states (all expanded by default)
+            const defaultStates = {
+                search: true,
+                navigation: true,
+                user: true
+            };
+
+            // Merge with saved states
+            const currentStates = { ...defaultStates, ...states };
+
+            // Apply states to sections
+            Object.keys(currentStates).forEach(sectionName => {
+                const header = document.querySelector(`[data-section="${sectionName}"]`);
+                if (header) {
+                    const section = header.parentElement;
+                    const content = section.querySelector('.sidebar-section-content');
+                    const toggle = header.querySelector('.sidebar-section-toggle');
+
+                    if (currentStates[sectionName]) {
+                        content.classList.remove('collapsed');
+                        toggle.classList.remove('collapsed');
+                    } else {
+                        content.classList.add('collapsed');
+                        toggle.classList.add('collapsed');
+                    }
+                }
+            });
+
+            // Initialize collapsible functionality after states are loaded
+            initializeCollapsibleSections();
+        }
+
+        // Scroll to top functionality
+        const scrollToTopBtn = document.getElementById('scrollToTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollToTopBtn.classList.add('show');
+            } else {
+                scrollToTopBtn.classList.remove('show');
+            }
+        });
+
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Search on Enter key in sidebar
+        document.getElementById('sidebarSearchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                this.closest('form').submit();
+            }
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

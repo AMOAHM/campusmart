@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Chats - Campus Mart{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-comments me-2"></i>My Chats</h2>
+                <div>
+                    <a href="{% url 'chat:create_support_chat' %}" class="btn btn-primary">
+                        <i class="fas fa-headset me-2"></i>Create Support Chat
+                    </a>
+                </div>
+            </div>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            {% if chat_rooms %}
+                <div class="row">
+                    {% for chat_room in chat_rooms %}
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                                            {% if chat_room.room_type == 'support' %}
+                                                <i class="fas fa-headset text-primary"></i>
+                                            {% else %}
+                                                <i class="fas fa-store text-primary"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="card-title mb-1">
+                                                {% if chat_room.room_type == 'support' %}
+                                                    Support Chat
+                                                {% else %}
+                                                    {{ chat_room.store.name }}
+                                                {% endif %}
+                                            </h6>
+                                            <small class="text-muted">
+                                                {% if chat_room.room_type == 'support' %}
+                                                    Customer Support
+                                                {% else %}
+                                                    Store Chat
+                                                {% endif %}
+                                            </small>
+                                        </div>
+                                    </div>
+                                    
+                                    <p class="card-text text-muted small mb-3">
+                                        <i class="far fa-clock me-1"></i>
+                                        Started {{ chat_room.created_at|date:"M d, Y H:i" }}
+                                    </p>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            {% with messages_count=chat_room.messages.count %}
+                                                {% if messages_count > 0 %}
+                                                    {{ messages_count }} message{{ messages_count|pluralize }}
+                                                {% else %}
+                                                    No messages yet
+                                                {% endif %}
+                                            {% endwith %}
+                                        </small>
+                                        <a href="{% url 'chat:chat_room' chat_room.pk %}" class="btn btn-sm btn-outline-primary">
+                                            Open Chat
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <div class="rounded-circle bg-light mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-comments fa-2x text-muted"></i>
+                    </div>
+                    <h4 class="text-muted mb-3">No Chats Yet</h4>
+                    <p class="text-muted mb-4">Start a conversation with customer support or with a store.</p>
+                    <a href="{% url 'chat:create_support_chat' %}" class="btn btn-primary me-2">
+                        <i class="fas fa-headset me-2"></i>Create Support Chat
+                    </a>
+                    <a href="{% url 'home' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-store me-2"></i>Browse Stores
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

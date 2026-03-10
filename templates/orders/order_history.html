@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Order History - Campus Mart{% endblock %}
+
+{% block content %}
+
+<div class="container my-5">
+    <h2 class="section-header">
+        {% if request.user.role == 'customer' %}
+            My Orders
+        {% else %}
+            Customer Orders
+        {% endif %}
+    </h2>
+    
+    {% if orders %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Order ID</th>
+                        {% if request.user.role == 'entrepreneur' %}
+                            <th>Customer</th>
+                        {% else %}
+                            <th>Store</th>
+                        {% endif %}
+                        <th>Date</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                        <tr>
+                            <td><strong>{{ order.order_id }}</strong></td>
+                            <td>
+                                {% if request.user.role == 'entrepreneur' %}
+                                    {{ order.customer.get_full_name|default:order.customer.username }}
+                                {% else %}
+                                    {{ order.store.name }}
+                                {% endif %}
+                            </td>
+                            <td>{{ order.created_at|date:"M d, Y H:i" }}</td>
+                            <td><strong>₵{{ order.total_price|floatformat:2 }}</strong></td>
+                            <td>
+                                {% if order.status == 'pending' %}
+                                    <span class="badge bg-warning">Pending</span>
+                                {% elif order.status == 'approved' %}
+                                    <span class="badge bg-info">Approved</span>
+                                {% elif order.status == 'out_for_delivery' %}
+                                    <span class="badge bg-primary">Out for Delivery</span>
+                                {% elif order.status == 'delivered' %}
+                                    <span class="badge bg-success">Delivered</span>
+                                {% elif order.status == 'cancelled' %}
+                                    <span class="badge bg-danger">Cancelled</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'orders:order_detail' order.id %}" class="btn btn-sm btn-primary">View</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> No orders found.
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

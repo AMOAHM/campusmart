@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ store.name }} - Campus Mart{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Reduce product card sizes */
+    .product-card {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+    
+    .product-image {
+        height: 120px !important;
+        object-fit: cover;
+    }
+    
+    .card-body {
+        padding: 12px !important;
+    }
+    
+    .card-title {
+        font-size: 13px !important;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+    
+    .card-text {
+        font-size: 11px !important;
+        margin-bottom: 4px;
+    }
+    
+    .badge-cream {
+        font-size: 10px !important;
+        padding: 3px 6px !important;
+    }
+    
+    .btn-sm {
+        padding: 5px 10px !important;
+        font-size: 11px !important;
+    }
+    
+    .text-primary {
+        font-size: 14px !important;
+        font-weight: 600;
+    }
+    
+    /* Reduce store header card */
+    .card {
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-body h2 {
+        font-size: 20px !important;
+        margin-bottom: 10px;
+    }
+    
+    .card-body p {
+        font-size: 13px !important;
+        margin-bottom: 8px;
+    }
+    
+    .img-fluid.rounded {
+        border-radius: 12px !important;
+        max-height: 180px !important;
+    }
+    
+    .bg-light.rounded {
+        border-radius: 12px !important;
+        height: 180px !important;
+    }
+    
+    .fa-store.fa-5x {
+        font-size: 2.5rem !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container my-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'stores:stores_list' %}">Stores</a></li>
+            <li class="breadcrumb-item active">{{ store.name }}</li>
+        </ol>
+    </nav>
+    
+    <!-- Store Header -->
+    <div class="row mb-5">
+        <div class="col-md-3">
+            {% if store.logo %}
+                <img src="{{ store.logo.url }}" class="img-fluid rounded" alt="{{ store.name }}" style="max-height: 250px; object-fit: cover;">
+            {% else %}
+                <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 250px;">
+                    <i class="fas fa-store fa-5x text-muted"></i>
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-body">
+                    <h2>{{ store.name }}</h2>
+                    <p class="text-muted"><i class="fas fa-map-marker-alt"></i> {{ store.location }}</p>
+                    <hr>
+                    <p>{{ store.description }}</p>
+                    <hr>
+                    <p>
+                        <strong>Total Products:</strong> {{ store.products.filter_by_active.count }}<br>
+                        <strong>Status:</strong> 
+                        {% if store.is_active %}
+                            <span class="badge bg-success">Active</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inactive</span>
+                        {% endif %}
+                    </p>
+                    {% if user.is_authenticated and user.role == 'customer' %}
+                        {% if store.phone_number %}
+                            <a href="https://wa.me/{{ store.phone_number }}" target="_blank" class="btn btn-success">
+                                <i class="fab fa-whatsapp"></i> Contact on WhatsApp
+                            </a>
+                        {% else %}
+                            <button class="btn btn-success" disabled>
+                                <i class="fab fa-whatsapp"></i> No WhatsApp Available
+                            </button>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Products -->
+    <h3 class="section-header">Products & Services</h3>
+    
+    {% if products %}
+        <div class="row g-4">
+            {% for product in products %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card product-card h-100">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                        {% else %}
+                            <div class="product-image bg-light d-flex align-items-center justify-content-center">
+                                <i class="fas fa-image fa-3x text-muted"></i>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge badge-cream">{{ product.get_product_type_display }}</span>
+                                {% if product.rating > 0 %}
+                                    <span class="text-warning">
+                                        <i class="fas fa-star"></i> {{ product.rating|floatformat:1 }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text text-muted small">{{ product.category.name }}</p>
+                            <p class="card-text"><strong class="text-primary">₵{{ product.price|floatformat:2 }}</strong></p>
+                            <a href="{% url 'products:product_detail' product.id %}" class="btn btn-primary btn-sm w-100">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> No products found in this store.
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}
