@@ -1,81 +1,254 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Chat - Campus Mart{% endblock %}
+{% block title %}Chat with {{ chat_room.store.name|default:"Support" }} - CampusMart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chat-container {
+        height: calc(100vh - 120px);
+        min-height: 600px;
+        background: var(--light-bg);
+        border-radius: 30px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        border: 1px solid var(--glass-border);
+    }
+
+    .chat-sidebar {
+        background: #f8fafc;
+        border-right: 1px solid var(--glass-border);
+        height: 100%;
+        overflow-y: auto;
+    }
+
+    .chat-main {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        background: #ffffff;
+    }
+
+    .chat-header {
+        padding: 20px 30px;
+        border-bottom: 1px solid var(--glass-border);
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .chat-body {
+        flex: 1;
+        padding: 30px;
+        overflow-y: auto;
+        background-color: #fdfcf9; /* Milk tint */
+        background-image: radial-gradient(var(--glass-border) 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+
+    .message-bubble {
+        max-width: 70%;
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .message-sent {
+        margin-left: auto;
+    }
+
+    .bubble-content {
+        padding: 15px 20px;
+        border-radius: 25px;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+    }
+
+    .message-sent .bubble-content {
+        background: var(--primary-gradient);
+        color: white;
+        border-bottom-right-radius: 5px;
+    }
+
+    .message-received .bubble-content {
+        background: #ffffff;
+        color: var(--text-primary);
+        border: 1px solid var(--glass-border);
+        border-bottom-left-radius: 5px;
+    }
+
+    .chat-footer {
+        padding: 20px 30px;
+        border-top: 1px solid var(--glass-border);
+        background: #ffffff;
+    }
+
+    .chat-input-wrap {
+        background: #f1f5f9;
+        border-radius: 50px;
+        padding: 5px 10px 5px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .chat-input-wrap:focus-within {
+        background: #ffffff;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px rgba(0, 71, 171, 0.05);
+    }
+
+    .chat-input-wrap input {
+        border: none !important;
+        background: transparent !important;
+        padding: 10px 0 !important;
+        box-shadow: none !important;
+    }
+
+    .send-btn {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.3s ease;
+    }
+
+    .send-btn:hover {
+        transform: scale(1.1) rotate(-15deg);
+    }
+
+    .sidebar-chat-item {
+        padding: 20px 25px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border-bottom: 1px solid rgba(0,0,0,0.02);
+        text-decoration: none;
+        display: block;
+    }
+
+    .sidebar-chat-item:hover {
+        background: #ffffff;
+    }
+
+    .sidebar-chat-item.active {
+        background: #ffffff;
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .avatar-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--primary-gradient);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.2rem;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-
-<div class="container my-5">
-    <h2 class="section-header">Chat Support</h2>
-    
-    <div class="row g-4">
-        <div class="col-lg-8">
-            <div class="card h-100">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">
-                        <i class="fas fa-comments"></i> 
-                        {% if chat_room.room_type == 'support' %}
-                            Support Chat
-                        {% else %}
-                            Chat with {{ chat_room.store.name }}
-                        {% endif %}
-                    </h5>
-                </div>
-                
-                <div class="card-body" style="height: 400px; overflow-y: auto; background-color: #f8f9fa;">
-                    {% for message in messages %}
-                        <div class="mb-3 {% if message.sender == request.user %}text-end{% endif %}">
-                            <div class="d-inline-block max-width-70" style="background-color: {% if message.sender == request.user %}#87CEEB{% else %}#e0e0e0{% endif %}; padding: 8px 12px; border-radius: 10px; max-width: 70%;">
-                                <p class="mb-1">{{ message.message }}</p>
-                                <small class="text-muted">{{ message.created_at|time:"H:i" }}</small>
+<div class="container py-4">
+    <div class="chat-container row g-0">
+        <!-- Sidebar -->
+        <div class="col-lg-4 d-none d-lg-block chat-sidebar">
+            <div class="p-4 border-bottom">
+                <h5 class="fw-bold mb-0">Messages</h5>
+            </div>
+            <div class="chat-list">
+                {% if chat_rooms %}
+                    {% for room in chat_rooms %}
+                        <a href="{% url 'chat:chat_room' room.pk %}" class="sidebar-chat-item {% if room.pk == chat_room.pk %}active{% endif %}">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="avatar-circle">
+                                    {{ room.store.name|default:"S"|slice:":1" }}
+                                </div>
+                                <div class="flex-grow-1 overflow-hidden">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 class="mb-0 fw-bold text-dark text-truncate">{{ room.store.name|default:"Support Chat" }}</h6>
+                                        <small class="text-muted extra-small">2m</small>
+                                    </div>
+                                    <p class="mb-0 text-muted small text-truncate">Click to open chat...</p>
+                                </div>
                             </div>
-                        </div>
-                    {% empty %}
-                        <p class="text-center text-muted">No messages yet. Start the conversation!</p>
+                        </a>
                     {% endfor %}
-                </div>
-                
-                <div class="card-footer">
-                    <form method="POST">
-                        {% csrf_token %}
-                        <div class="input-group">
-                            <input type="text" class="form-control" name="message" placeholder="Type your message..." required>
-                            <button class="btn btn-primary" type="submit">Send</button>
-                        </div>
-                    </form>
-                </div>
+                {% else %}
+                    <div class="p-5 text-center text-muted">
+                        <i class="fas fa-comments fa-3x mb-3 opacity-20"></i>
+                        <p class="small">No other chats active</p>
+                    </div>
+                {% endif %}
             </div>
         </div>
-        
-        <div class="col-lg-4">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Chat Info</h5>
+
+        <!-- Main Chat Area -->
+        <div class="col-lg-8 chat-main">
+            <div class="chat-header">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-circle" style="width: 40px; height: 40px; font-size: 1rem;">
+                        {{ chat_room.store.name|default:"S"|slice:":1" }}
+                    </div>
+                    <div>
+                        <h6 class="mb-0 fw-bold text-dark">{{ chat_room.store.name|default:"Customer Support" }}</h6>
+                        <small class="text-success extra-small"><i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i> Online</small>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <strong>Chat Type:</strong><br>
-                        {% if chat_room.room_type == 'support' %}
-                            <span class="badge bg-info">Support Chat</span>
-                        {% else %}
-                            <span class="badge bg-success">Store Chat</span>
-                            <br><small class="text-muted">{{ chat_room.store.name }}</small>
-                        {% endif %}
-                    </div>
-                    <div class="mb-3">
-                        <strong>Started:</strong><br>
-                        <small class="text-muted">{{ chat_room.created_at|date:"M d, Y H:i" }}</small>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Messages:</strong><br>
-                        <small class="text-muted">{{ messages|length }} message{{ messages|length|pluralize }}</small>
-                    </div>
-                    <a href="{% url 'chat:chat_list' %}" class="btn btn-outline-primary btn-sm">
-                        <i class="fas fa-arrow-left me-1"></i>Back to Chat List
-                    </a>
+                <div class="d-flex gap-3 text-secondary">
+                    <i class="fas fa-phone-alt cursor-pointer"></i>
+                    <i class="fas fa-video cursor-pointer"></i>
+                    <i class="fas fa-info-circle cursor-pointer"></i>
                 </div>
+            </div>
+
+            <div class="chat-body scrollbar-hide" id="chatBody">
+                {% for message in messages %}
+                    <div class="message-bubble {% if message.sender == request.user %}message-sent{% else %}message-received{% endif %}">
+                        <div class="bubble-content">
+                            {{ message.message }}
+                        </div>
+                        <small class="text-muted extra-small mt-1 d-block {% if message.sender == request.user %}text-end{% endif %}">
+                            {{ message.created_at|time:"H:i" }}
+                        </small>
+                    </div>
+                {% empty %}
+                    <div class="text-center py-5">
+                        <div class="bg-light d-inline-block rounded-pill px-4 py-2 small text-muted">
+                            Start of conversation
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="chat-footer">
+                <form method="POST" id="chatForm">
+                    {% csrf_token %}
+                    <div class="chat-input-wrap">
+                        <i class="far fa-smile text-secondary fs-5 cursor-pointer"></i>
+                        <input type="text" class="form-control" name="message" placeholder="Write a message..." required autocomplete="off">
+                        <button class="send-btn" type="submit">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
 
+<script>
+    // Auto-scroll to bottom
+    const chatBody = document.getElementById('chatBody');
+    chatBody.scrollTop = chatBody.scrollHeight;
+</script>
 {% endblock %}

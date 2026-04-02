@@ -11,24 +11,26 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --primary-color: #667eea;
-            --secondary-color: #764ba2;
-            --accent-color: #f093fb;
-            --dark-bg: #0f172a;
-            --light-bg: #1e293b;
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --sidebar-width: 320px;
+            --primary-color: #0047ab; /* Thick Cobalt Blue */
+            --secondary-color: #0056b3; /* Vibrant Blue */
+            --accent-color: #3b82f6; /* Blue Accent */
+            --dark-bg: #fffef9; /* Milk Color */
+            --light-bg: #ffffff; 
+            --text-primary: #1e293b; 
+            --text-secondary: #475569;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(0, 71, 171, 0.1);
+            --sidebar-width: 300px;
+            --radius-lg: 40px;
+            --radius-md: 25px;
         }
 
         * {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Quicksand', sans-serif;
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -39,7 +41,7 @@
         }
 
         body {
-            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--light-bg) 100%);
+            background: var(--dark-bg);
             color: var(--text-primary);
             line-height: 1.6;
             min-height: 100vh;
@@ -55,9 +57,9 @@
             width: 100%;
             height: 100%;
             background:
-                radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 40% 20%, rgba(240, 147, 251, 0.1) 0%, transparent 50%);
+                radial-gradient(circle at 20% 50%, rgba(30, 64, 175, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(30, 64, 175, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(30, 64, 175, 0.04) 0%, transparent 50%);
             pointer-events: none;
             z-index: -1;
         }
@@ -89,10 +91,10 @@
             left: -100vw;
             width: var(--sidebar-width);
             height: 100vh;
-            background: linear-gradient(180deg, var(--dark-bg) 0%, var(--light-bg) 100%);
+            background: var(--dark-bg);
             backdrop-filter: blur(20px);
             border-right: 1px solid var(--glass-border);
-            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
             transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             z-index: 1000;
             overflow-y: auto;
@@ -162,7 +164,7 @@
         .sidebar-search .search-input {
             width: 100%;
             padding: 12px 45px 12px 15px;
-            background: var(--glass-bg);
+            background: #ffffff;
             border: 1px solid var(--glass-border);
             border-radius: 25px;
             color: var(--text-primary);
@@ -173,8 +175,8 @@
         .sidebar-search .search-input:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
-            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+            background: #ffffff;
         }
 
         .sidebar-search .search-btn {
@@ -249,7 +251,8 @@
             align-items: center;
             gap: 15px;
             padding: 15px;
-            background: var(--glass-bg);
+            background: #ffffff;
+            border: 1px solid var(--glass-border);
             border-radius: 12px;
             margin-bottom: 15px;
         }
@@ -333,7 +336,6 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
             animation: glow 3s ease-in-out infinite alternate;
         }
 
@@ -415,7 +417,7 @@
         }
 
         .alert-info {
-            background-color: rgba(135, 206, 235, 0.1);
+            background-color: rgba(30, 64, 175, 0.1);
             border-color: var(--primary-color);
             color: var(--primary-color);
         }
@@ -440,18 +442,37 @@
 
         /* Form enhancements */
         input[type="text"], input[type="password"], input[type="email"], input[type="number"], textarea, select, .form-control {
-            background: var(--glass-bg) !important;
+            background: #ffffff !important;
             color: var(--text-primary) !important;
-            border: 1px solid var(--glass-border) !important;
-            border-radius: 8px !important;
+            border: 2px solid #f1f5f9 !important;
+            border-radius: 18px !important;
+            padding: 12px 20px !important;
             transition: all 0.3s ease;
         }
 
         input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus, input[type="number"]:focus, textarea:focus, select:focus, .form-control:focus {
-            background: rgba(255, 255, 255, 0.1) !important;
+            background: #ffffff !important;
             color: var(--text-primary) !important;
             border-color: var(--primary-color) !important;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+            box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.1) !important;
+            outline: none !important;
+        }
+
+        /* Fix visibility for Chrome/Edge autofill */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+            -webkit-text-fill-color: var(--text-primary) !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        .form-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
         }
 
         button, .btn {
@@ -471,24 +492,23 @@
 
         /* Cards */
         .card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            background: #ffffff;
+            border: 2px solid #fef3c7; /* Soft Cream Border */
+            border-radius: var(--radius-md);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.02);
             transition: all 0.3s ease;
         }
 
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            transform: scale(1.02);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
             border-color: var(--primary-color);
         }
 
         /* Footer */
         footer {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            color: white;
+            background: #ffffff;
+            color: var(--text-primary);
             padding: 60px 0 20px;
             margin-top: 80px;
             border-top: 1px solid var(--glass-border);
@@ -498,17 +518,17 @@
             font-weight: 700;
             margin-bottom: 20px;
             font-size: 1.1rem;
-            color: white;
+            color: var(--primary-color);
         }
 
         footer p {
-            color: rgba(255, 255, 255, 0.8);
+            color: var(--text-secondary);
             font-size: 0.95rem;
             line-height: 1.8;
         }
 
         footer a {
-            color: rgba(255, 255, 255, 0.8);
+            color: var(--text-secondary);
             text-decoration: none;
             transition: all 0.3s ease;
             display: inline-block;
@@ -524,15 +544,15 @@
         }
 
         .footer-divider {
-            border-color: rgba(255, 255, 255, 0.1);
+            border-color: var(--glass-border);
             margin: 40px 0 30px;
         }
 
         .footer-bottom {
             text-align: center;
             padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.7);
+            border-top: 1px solid var(--glass-border);
+            color: var(--text-secondary);
             font-size: 0.9rem;
         }
 
@@ -548,7 +568,7 @@
             justify-content: center;
             width: 40px;
             height: 40px;
-            background: rgba(135, 206, 235, 0.2);
+            background: rgba(30, 64, 175, 0.1);
             border-radius: 50%;
             transition: all 0.3s ease;
         }
@@ -844,26 +864,80 @@
                 <i class="fas fa-shopping-bag"></i>
                 <span>KTU CampusMart</span>
             </a>
+            <div class="d-flex align-items-center gap-2">
+                {% if user.is_authenticated %}
+                <!-- Notifications -->
+                <div class="dropdown me-2">
+                    <a href="#" class="position-relative text-dark" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-bell" style="font-size: 1.2rem;"></i>
+                        {% if unread_notifications.count > 0 %}
+                        <span class="badge bg-danger position-absolute" id="notificationBadge" style="top: -8px; right: -8px; font-size: 0.6em; padding: 3px 5px; border-radius: 50%;">
+                            {{ unread_notifications.count }}
+                        </span>
+                        {% endif %}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end p-0 shadow-lg border-0 rounded-4" aria-labelledby="notificationDropdown" style="width: 320px; max-height: 400px; overflow-y: auto;">
+                        <li class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0 fw-bold">Notifications</h6>
+                            <span class="badge bg-primary rounded-pill" id="newLabel">{% if unread_notifications.count > 0 %}New{% else %}Recent{% endif %}</span>
+                        </li>
+                        <div class="notification-list" id="notificationList">
+                            {% if notifications %}
+                                {% for note in notifications %}
+                                <li class="p-3 border-bottom hover-bg {% if not note.is_read %}bg-light-blue{% endif %}">
+                                    <div class="d-flex gap-3">
+                                        <div class="bg-primary-subtle text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <i class="fas fa-{% if note.notification_type == 'new_order' %}shopping-cart{% elif note.notification_type == 'order_status' %}truck{% else %}info-circle{% endif %}"></i>
+                                        </div>
+                                        <div>
+                                            <p class="mb-0 small fw-bold text-dark">{{ note.title }}</p>
+                                            <p class="mb-0 extra-small text-muted">{{ note.message|truncatechars:60 }}</p>
+                                            <small class="extra-small text-secondary">{{ note.created_at|timesince }} ago</small>
+                                        </div>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            {% else %}
+                                <li class="p-4 text-center py-5">
+                                    <i class="fas fa-bell-slash fa-3x text-muted mb-3 opacity-20"></i>
+                                    <p class="mb-0 text-secondary">All caught up!</p>
+                                    <small class="text-muted">No new notifications at the moment.</small>
+                                </li>
+                            {% endif %}
+                        </div>
+                        <li class="p-2 border-top">
+                            <a class="dropdown-item text-center small text-primary fw-bold" href="{% url 'notifications:list' %}">View All</a>
+                        </li>
+                    </ul>
+                </div>
 
-            <div class="d-flex align-items-center gap-3">
-                {% if user.is_authenticated and user.role == 'customer' %}
-                <a href="{% url 'orders:cart_view' %}" class="position-relative">
-                    <i class="fas fa-shopping-cart text-white" style="font-size: 1.2rem;"></i>
-                    {% if cart_items %}
-                        <span class="badge bg-danger position-absolute" style="top: -8px; right: -8px; font-size: 0.7em;">{{ cart_items|length }}</span>
+                <!-- Cart -->
+                {% if user.role == 'customer' %}
+                <a href="{% url 'orders:cart_view' %}" class="position-relative text-dark me-2">
+                    <i class="fas fa-shopping-cart" style="font-size: 1.2rem;"></i>
+                    {% if cart_count > 0 %}
+                    <span class="badge bg-danger position-absolute" style="top: -8px; right: -8px; font-size: 0.6em; padding: 3px 5px; border-radius: 50%;">
+                        {{ cart_count }}
+                    </span>
                     {% endif %}
                 </a>
                 {% endif %}
+                {% endif %}
 
+                <!-- User Account -->
                 <div class="dropdown">
-                    <button class="btn btn-link text-white p-0" type="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user" style="font-size: 1.2rem;"></i>
+                    <button class="btn btn-link text-dark p-0" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle" style="font-size: 1.5rem;"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4">
                         {% if user.is_authenticated %}
-                            <li><h6 class="dropdown-header">{{ user.get_full_name|default:user.username }}</h6></li>
-                            <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><h6 class="dropdown-header fw-bold text-primary">{{ user.get_full_name|default:user.username }}</h6></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="fas fa-user-circle me-2"></i>Profile</a></li>
+                            {% if user.role == 'customer' %}
                             <li><a class="dropdown-item" href="{% url 'orders:order_history' %}"><i class="fas fa-box me-2"></i>Orders</a></li>
+                            {% elif user.role == 'entrepreneur' %}
+                            <li><a class="dropdown-item" href="{% url 'stores:entrepreneur_dashboard' %}"><i class="fas fa-chart-line me-2"></i>Dashboard</a></li>
+                            {% endif %}
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                         {% else %}
@@ -872,6 +946,7 @@
                         {% endif %}
                     </ul>
                 </div>
+            </div>
             </div>
         </div>
     </nav>
@@ -1096,6 +1171,37 @@
                 this.closest('form').submit();
             }
         });
+        // Notification sync functionality
+        const notificationDropdown = document.getElementById('notificationDropdown');
+        if (notificationDropdown) {
+            notificationDropdown.addEventListener('show.bs.dropdown', function () {
+                const badge = document.getElementById('notificationBadge');
+                const label = document.getElementById('newLabel');
+                const listItems = document.querySelectorAll('#notificationList li.bg-light-blue');
+
+                if (badge) {
+                    fetch('{% url "notifications:mark_all_read" %}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'Content-Type': 'application/json'
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            badge.remove();
+                            if (label) {
+                                label.textContent = 'Recent';
+                                label.classList.replace('bg-primary', 'bg-secondary');
+                            }
+                            listItems.forEach(item => item.classList.remove('bg-light-blue'));
+                        }
+                    })
+                    .catch(error => console.error('Error marking notifications as read:', error));
+                }
+            });
+        }
     </script>
 
     {% block extra_js %}{% endblock %}

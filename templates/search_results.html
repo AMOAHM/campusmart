@@ -1,110 +1,179 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Search Results - Campus Mart{% endblock %}
+{% block title %}Search Results - CampusMart{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* Reduce product card sizes */
-    .product-card {
-        border-radius: 12px;
+    :root {
+        --primary-gradient: linear-gradient(135deg, #0047ab 0%, #0056b3 100%);
+        --glass-bg: #ffffff;
+        --glass-border: rgba(0, 71, 171, 0.1);
+    }
+
+    .search-hero {
+        padding: 60px 0 30px;
+        background: linear-gradient(to bottom, rgba(96, 165, 250, 0.05), transparent);
+        text-align: center;
+    }
+
+    .query-highlight {
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 800;
+    }
+
+    .premium-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
         overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s, box-shadow 0.2s;
+        height: 100%;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    
-    .product-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+
+    .premium-card:hover {
+        transform: scale(1.03);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+        border-color: var(--secondary-color);
     }
-    
-    .product-image {
-        height: 120px !important;
+
+    .card-img-wrap {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+    }
+
+    .card-img-wrap img {
+        width: 100%;
+        height: 100%;
         object-fit: cover;
+        transition: transform 0.6s ease;
     }
-    
-    .card-body {
-        padding: 12px !important;
+
+    .premium-card:hover .card-img-wrap img {
+        transform: scale(1.1);
     }
-    
+
+    .card-content {
+        padding: 24px;
+    }
+
+    .card-cat {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--primary-color);
+        margin-bottom: 8px;
+    }
+
     .card-title {
-        font-size: 13px !important;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+        color: var(--text-primary);
+        display: block;
+        text-decoration: none;
+    }
+
+    .price-tag {
+        font-size: 1.4rem;
+        font-weight: 800;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .store-link {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 15px;
+    }
+
+    .quick-view {
+        width: 100%;
+        padding: 10px;
+        border-radius: 20px;
+        background: #f1f5f9;
+        border: none;
+        color: var(--text-primary);
         font-weight: 600;
-        margin-bottom: 6px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
     }
-    
-    .card-text {
-        font-size: 11px !important;
-        margin-bottom: 4px;
-    }
-    
-    .store-badge {
-        font-size: 11px !important;
-        margin-bottom: 4px;
-        color: #666;
-    }
-    
-    .badge-cream {
-        font-size: 10px !important;
-        padding: 3px 6px !important;
-    }
-    
-    .btn-sm {
-        padding: 5px 10px !important;
-        font-size: 11px !important;
-    }
-    
-    .text-primary {
-        font-size: 14px !important;
-        font-weight: 600;
-    }
-    
-    .text-warning {
-        font-size: 11px !important;
+
+    .premium-card:hover .quick-view {
+        background: var(--primary-gradient);
+        color: white;
     }
 </style>
 {% endblock %}
 
 {% block content %}
+<div class="search-hero">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Search Results</h1>
+        <p class="lead text-secondary">Showing matches for "<span class="query-highlight">{{ query }}</span>"</p>
+    </div>
+</div>
 
-<div class="container my-5">
-    <h2 class="section-header">Search Results for "{{ query }}"</h2>
-    
+<div class="container pb-5">
     {% if results %}
         <div class="row g-4">
             {% for product in results %}
-                <div class="col-md-6 col-lg-4">
-                    <div class="card product-card h-100">
-                        {% if product.image %}
-                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
-                        {% else %}
-                            <div class="product-image bg-light d-flex align-items-center justify-content-center">
-                                <i class="fas fa-image fa-3x text-muted"></i>
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="premium-card">
+                        <div class="card-img-wrap">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                            {% else %}
+                                <img src="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80" alt="Placeholder">
+                            {% endif %}
+                        </div>
+                        <div class="card-content">
+                            <span class="card-cat">{{ product.category.name|default:"General" }}</span>
+                            <a href="{% url 'products:product_detail' product.id %}" class="card-title">{{ product.name|truncatechars:45 }}</a>
+                            <div class="store-link">
+                                <i class="fas fa-store"></i>
+                                <span>{{ product.store.name }}</span>
                             </div>
-                        {% endif %}
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <span class="badge badge-cream">{{ product.get_product_type_display }}</span>
-                                {% if product.rating > 0 %}
-                                    <span class="text-warning">
-                                        <i class="fas fa-star"></i> {{ product.rating|floatformat:1 }}
-                                    </span>
-                                {% endif %}
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="price-tag">GH₵{{ product.price }}</span>
+                                <div class="text-warning small">
+                                    <i class="fas fa-star"></i> {{ product.rating|default:"4.5" }}
+                                </div>
                             </div>
-                            <h5 class="card-title">{{ product.name }}</h5>
-                            <p class="store-badge"><i class="fas fa-store"></i> {{ product.store.name }}</p>
-                            <p class="card-text text-muted small">{{ product.category.name }}</p>
-                            <p class="card-text"><strong class="text-primary">₵{{ product.price|floatformat:2 }}</strong></p>
-                            <a href="{% url 'products:product_detail' product.id %}" class="btn btn-primary btn-sm w-100">View Details</a>
+                            <a href="{% url 'products:product_detail' product.id %}" class="quick-view mt-3">
+                                View Details
+                            </a>
                         </div>
                     </div>
                 </div>
             {% endfor %}
         </div>
     {% else %}
-        <div class="alert alert-info">
-            <i class="fas fa-info-circle"></i> No products found matching "{{ query }}". Try different keywords or <a href="{% url 'products:products_list' %}">browse all products</a>.
+        <div class="text-center py-5">
+            <div class="glass-bg p-5 rounded-5 border shadow-lg d-inline-block" style="max-width: 600px;">
+                <i class="fas fa-search fa-4x text-secondary mb-4 opacity-50"></i>
+                <h3 class="fw-bold mb-3">No results found</h3>
+                <p class="text-secondary mb-4">We couldn't find any products matching your search query. Try broadening your terms or explore our top categories.</p>
+                <div class="d-flex gap-3 justify-content-center">
+                    <a href="/" class="btn px-4">Back to Home</a>
+                    <a href="{% url 'products:products_list' %}" class="btn px-4 secondary">Browse All</a>
+                </div>
+            </div>
         </div>
     {% endif %}
 </div>
-
 {% endblock %}
+

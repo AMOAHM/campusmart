@@ -84,3 +84,14 @@ def admin_dashboard_context(request):
             'server_load_percentage': 0,
             'database_usage_percentage': 0,
         }
+
+def cart_context(request):
+    """Provide global cart count for all templates"""
+    if request.user.is_authenticated and request.user.role == 'customer':
+        try:
+            from orders.models import Cart
+            cart, created = Cart.objects.get_or_create(customer=request.user)
+            return {'cart_count': cart.items.count()}
+        except:
+            pass
+    return {'cart_count': 0}
